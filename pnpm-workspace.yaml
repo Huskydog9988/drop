@@ -4,6 +4,7 @@ onlyBuiltDependencies:
   - "@tailwindcss/oxide"
   - esbuild
   - prisma
+  - sharp
 
 overrides:
   droplet: link:../../.local/share/pnpm/global/5/node_modules/@drop-oss/droplet
