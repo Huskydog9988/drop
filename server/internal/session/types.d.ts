@@ -9,7 +9,7 @@ export type Session = {
 
 export interface SessionProvider {
   getSession: <T extends Session>(token: string) => Promise<T | undefined>;
-  setSession: (token: string, data: Session) => Promise<boolean>;
+  setSession: (token: string, data: Session) => Promise<Session | undefined>;
   updateSession: (token: string, data: Session) => Promise<boolean>;
   removeSession: (token: string) => Promise<boolean>;
   cleanupSessions: () => Promise<void>;
