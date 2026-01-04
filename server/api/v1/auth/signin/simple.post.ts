@@ -84,7 +84,9 @@ export default defineEventHandler<{
       });
 
     // TODO: send user to forgot password screen or something to force them to change their password to new system
-    await sessionHandler.signin(h3, authMek.userId, body.rememberMe);
+    await sessionHandler.signin(h3, authMek.userId, {
+      rememberMe: body.rememberMe ?? false,
+    });
     return { result: true, userId: authMek.userId };
   }
 
@@ -102,6 +104,8 @@ export default defineEventHandler<{
       statusMessage: t("errors.auth.invalidUserOrPass"),
     });
 
-  await sessionHandler.signin(h3, authMek.userId, body.rememberMe);
+  await sessionHandler.signin(h3, authMek.userId, {
+    rememberMe: body.rememberMe ?? false,
+  });
   return { result: true, userId: authMek.userId };
 });

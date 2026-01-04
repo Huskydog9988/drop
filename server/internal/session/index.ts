@@ -21,6 +21,14 @@ const extendedSessionLength: DurationLike = {
   year: 1,
 };
 
+export interface SigninOptions {
+  // default value: false
+  rememberMe?: boolean;
+
+  // set default session data
+  data?: Session["data"];
+}
+
 export class SessionHandler {
   private sessionProvider: SessionProvider;
 
@@ -31,13 +39,16 @@ export class SessionHandler {
     // this.sessionProvider = createMemorySessionProvider();
   }
 
-  async signin(h3: H3Event, userId: string, rememberMe: boolean = false) {
+  async signin(h3: H3Event, userId: string, options?: SigninOptions) {
+    const rememberMe = options?.rememberMe ?? false;
+    const data = options?.data ?? {};
+
     const expiresAt = this.createExipreAt(rememberMe);
     const token = this.createSessionCookie(h3, expiresAt);
     return await this.sessionProvider.setSession(token, {
       userId,
       expiresAt,
-      data: {},
+      data,
     });
   }
 
@@ -69,10 +80,20 @@ export class SessionHandler {
   async signout(h3: H3Event) {
     const token = this.getSessionToken(h3);
     if (!token) return false;
-    const res = await this.sessionProvider.removeSession(token);
-    if (!res) return false;
+    if (!this.signoutByToken(token)) return false;
     deleteCookie(h3, dropTokenCookieName);
     return true;
+  }
+
+  /**
+   * Signout session by token
+   * @Note Should only be used in special cases (eg OIDC logout)
+   * @param token
+   * @returns
+   */
+  async signoutByToken(token: string) {
+    const res = await this.sessionProvider.removeSession(token);
+    return res;
   }
 
   async cleanupSessions() {

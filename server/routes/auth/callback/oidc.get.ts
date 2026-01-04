@@ -1,5 +1,6 @@
 import sessionHandler from "~/server/internal/session";
 import authManager from "~/server/internal/auth";
+import type { Session } from "~/server/internal/session/types";
 
 defineRouteMeta({
   openAPI: {
@@ -10,6 +11,9 @@ defineRouteMeta({
 });
 
 export default defineEventHandler(async (h3) => {
+  // dont cache login responses
+  setHeader(h3, "Cache-Control", "no-store");
+
   const enabledAuthManagers = authManager.getAuthProviders();
   if (!enabledAuthManagers.OpenID) return sendRedirect(h3, "/auth/signin");
 
@@ -38,7 +42,22 @@ export default defineEventHandler(async (h3) => {
       statusMessage: `Failed to sign in: "${result}". Please try again.`,
     });
 
-  await sessionHandler.signin(h3, result.user.id, true);
+  // Attach OIDC session data
+  const odicData: Session["data"]["odic"] = {
+    iss: result.claims.iss,
+  };
+  if (result.claims.sub) odicData.sub = result.claims.sub;
+  if (result.claims.sid) odicData.sid = result.claims.sid;
+
+  const session = await sessionHandler.signin(h3, result.user.id, {
+    rememberMe: true,
+    data: { odic: odicData },
+  });
+  if (!session)
+    throw createError({
+      statusCode: 500,
+      statusMessage: "Failed to sign user in.",
+    });
 
   if (result.options.redirect) {
     return sendRedirect(h3, result.options.redirect);
