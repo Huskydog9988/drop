@@ -2,6 +2,7 @@ import tailwindcss from "@tailwindcss/vite";
 import { execSync } from "node:child_process";
 import { cpSync, readFileSync, existsSync } from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import module from "module";
 import { viteStaticCopy } from "vite-plugin-static-copy";
 import { type } from "arktype";
@@ -282,11 +283,7 @@ function getDropVersion(): string {
   // example nightly: "v0.3.0-nightly.2025.05.28"
   const defaultVersion = "v0.0.0-alpha.0";
 
-  // get path
-  const packageJsonPath = path.join(
-    path.dirname(import.meta.url.replace("file://", "")),
-    "package.json",
-  );
+  const packageJsonPath = fileURLToPath(import.meta.resolve("./package.json"));
 
   if (!existsSync(packageJsonPath)) {
     console.error("Could not find package.json, using default version.");
