@@ -66,5 +66,8 @@ export default function createDBSessionHandler(): SessionProvider {
         },
       });
     },
+    async findSessions(_options) {
+      return [];
+    },
   };
 }
