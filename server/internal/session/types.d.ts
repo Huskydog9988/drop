@@ -21,7 +21,7 @@ export type SessionWithToken = Session & {
   token: string;
 };
 
-export interface SessionFindTerms {
+export interface SessionSearchTerms {
   userId?: string;
   data: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -40,5 +40,5 @@ export interface SessionProvider {
   updateSession: (token: string, data: Session) => Promise<boolean>;
   removeSession: (token: string) => Promise<boolean>;
   cleanupSessions: () => Promise<void>;
-  findSessions: (options: SessionFindTerms) => Promise<SessionWithToken[]>;
+  findSessions: (options: SessionSearchTerms) => Promise<SessionWithToken[]>;
 }
