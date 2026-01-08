@@ -14,7 +14,14 @@ export type Session = {
   };
 };
 
-export interface SessionFindOptions {
+/**
+ * A more complete session type that includes the token to identify it
+ */
+export type SessionWithToken = Session & {
+  token: string;
+};
+
+export interface SessionFindTerms {
   userId?: string;
   data: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -23,10 +30,15 @@ export interface SessionFindOptions {
 }
 
 export interface SessionProvider {
-  getSession: <T extends Session>(token: string) => Promise<T | undefined>;
-  setSession: (token: string, data: Session) => Promise<Session | undefined>;
+  getSession: <T extends SessionWithToken>(
+    token: string,
+  ) => Promise<T | undefined>;
+  setSession: (
+    token: string,
+    data: Session,
+  ) => Promise<SessionWithToken | undefined>;
   updateSession: (token: string, data: Session) => Promise<boolean>;
   removeSession: (token: string) => Promise<boolean>;
   cleanupSessions: () => Promise<void>;
-  findSessions: (options: SessionFindOptions) => Promise<Session[]>;
+  findSessions: (options: SessionFindTerms) => Promise<SessionWithToken[]>;
 }

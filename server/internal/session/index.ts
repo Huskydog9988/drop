@@ -1,5 +1,10 @@
 import type { H3Event } from "h3";
-import type { Session, SessionFindOptions, SessionProvider } from "./types";
+import type {
+  Session,
+  SessionFindTerms,
+  SessionProvider,
+  SessionWithToken,
+} from "./types";
 import { randomUUID } from "node:crypto";
 import { parse as parseCookies } from "cookie-es";
 import type { MinimumRequestObject } from "~/server/h3";
@@ -56,7 +61,7 @@ export class SessionHandler {
    * Get a session associated with a request
    * @returns session
    */
-  async getSession<T extends Session>(request: MinimumRequestObject) {
+  async getSession<T extends SessionWithToken>(request: MinimumRequestObject) {
     const token = this.getSessionToken(request);
     if (!token) return undefined;
     const session = await this.sessionProvider.getSession<T>(token);
@@ -103,7 +108,7 @@ export class SessionHandler {
     await this.sessionProvider.cleanupSessions();
   }
 
-  async findSessions(options: SessionFindOptions) {
+  async findSessions(options: SessionFindTerms) {
     return await this.sessionProvider.findSessions(options);
   }
 
